@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bright Pattern JS API 샘플</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Bright Pattern Agent Desktop Client-Side JavaScript API v5.19 샘플</h1>
+  </header>
+
+  <div class="layout" id="layout">
+    <div class="col left-col" id="leftCol">
+      <!-- 좌측: 컨트롤 패널 -->
+      <section id="env">
+        <h2>API 접속 환경 설정</h2>
+        <div class="row">
+          <label for="domain">인스턴스 도메인 (예: example.brightpattern.com)</label>
+          <input type="text" id="domain" placeholder="example.brightpattern.com" autocomplete="url" />
+        </div>
+        <div class="row">
+          <label><input type="checkbox" id="standalone" checked /> Standalone 모드 사용 (Communicator 위젯만 로드)</label>
+        </div>
+        <div class="row">
+          <label><input type="checkbox" id="maskLogs" checked /> 민감 정보 로그 마스킹</label>
+        </div>
+        <div class="row">
+          <button id="btnInit">API 초기화</button>
+          <button id="btnReinit" title="위젯/세션 재연결이 필요할 때 사용">재연결/재초기화</button>
+        </div>
+      </section>
+
+      <section id="login" class="hidden">
+        <h2>로그인</h2>
+        <div class="row">
+          <label for="username">Username</label>
+          <input type="text" id="username" autocomplete="username" />
+        </div>
+        <div class="row">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" />
+        </div>
+        <div class="row">
+          <label for="tenant">Tenant (도메인)</label>
+          <input type="text" id="tenant" placeholder="example.brightpattern.com" autocomplete="url" />
+        </div>
+        <div class="row">
+          <label><input type="checkbox" id="forceLogin" /> 강제 로그인(force)</label>
+        </div>
+        <div class="row">
+          <button id="btnLogin">로그인</button>
+          <button id="btnLogout" disabled>로그아웃</button>
+        </div>
+        <div class="row"><span id="loginStateLabel">상태: unknown</span></div>
+      </section>
+
+      <section id="agent" class="hidden">
+        <h2>에이전트 상태</h2>
+        <div class="row">
+          <button id="btnGetLoginState">로그인 상태 조회</button>
+          <button id="btnGetAgentState">에이전트 상태 조회</button>
+        </div>
+        <div class="row">
+          <button id="btnSetReady">대기(Ready)</button>
+          <select id="notReadyReason" style="min-width:260px"><option value="">Not Ready 사유 선택</option></select>
+          <button id="btnLoadReasons">사유목록 갱신</button>
+          <button id="btnSetNotReady">이석(Not Ready)</button>
+        </div>
+        <div class="row"><span>현재 상태: </span><strong id="agentStateLabel">unknown</strong></div>
+      </section>
+
+      <section id="chat" class="hidden">
+        <h2>채팅</h2>
+        <div class="row">
+          <label for="serviceId">서비스 ID</label>
+          <input type="text" id="serviceId" placeholder="서비스 ID" />
+        </div>
+        <div class="row">
+          <button id="btnLoadServices">서비스 목록</button>
+          <select id="serviceSelect" style="min-width:260px"><option value="">서비스 선택</option></select>
+          <button id="btnStartChat">채팅 시작</button>
+        </div>
+        <div id="chatArea" class="hidden">
+          <div id="messages" class="messages"></div>
+          <div class="row">
+            <input type="text" id="chatInput" placeholder="메시지 입력" />
+            <button id="btnSend" disabled>전송</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="call" class="hidden">
+        <h2>통화(Call) 제어</h2>
+        <div class="row">
+          <label for="phoneNumber">전화번호</label>
+          <input type="text" id="phoneNumber" placeholder="예: +821012345678" />
+          <button id="btnStartCall">통화 시작</button>
+        </div>
+        <div class="row">
+          <button id="btnMuteToggle">마이크 음소거</button>
+          <button id="btnHoldToggle">보류(Hold)</button>
+          <button id="btnEndCall" title="현재 통화 종료">통화 종료</button>
+        </div>
+        <div class="row">
+          <label for="dtmfDigits">DTMF</label>
+          <input type="text" id="dtmfDigits" placeholder="0123456789#*" />
+          <button id="btnSendDtmf">DTMF 전송</button>
+        </div>
+        <div class="row">
+          <label for="consultTarget">상담/컨퍼런스 대상</label>
+          <input type="text" id="consultTarget" placeholder="내선/번호/사용자" />
+          <button id="btnConsultCall" title="별도 라인으로 상담 콜">상담 시작</button>
+          <button id="btnInviteConf" title="현재 콜 컨퍼런스에 초대">컨퍼런스 초대</button>
+          <button id="btnRemoveFromConf" title="컨퍼런스에서 제거">컨퍼런스 제거</button>
+          <button id="btnDestroyConf" title="컨퍼런스 종료">컨퍼런스 종료</button>
+        </div>
+      </section>
+
+      <section id="interact" class="hidden">
+        <h2>상호작용 완료/종료</h2>
+        <div class="row">
+          <button id="btnLeave">Leave</button>
+          <button id="btnComplete">Complete</button>
+          <button id="btnLeaveComplete">Leave + Complete</button>
+        </div>
+      </section>
+
+      <section id="recording" class="hidden">
+        <h2>녹음/스크린 제어</h2>
+        <div class="row">
+          <button id="btnRecToggle">통화 녹음 시작</button>
+          <button id="btnScreenMuteToggle">스크린 녹음 음소거</button>
+          <button id="btnGetScreenState">스크린 녹음 상태 조회</button>
+        </div>
+        <div class="row"><span id="screenRecStateLabel">스크린 녹음: unknown</span></div>
+      </section>
+
+      <section id="interactionControls" class="hidden">
+        <h2>상호작용 제어(공통)</h2>
+        <div class="row">
+          <span>활성 Interaction ID: </span><strong id="activeInteractionLabel" style="word-break:break-all;font-size:11px;color:var(--muted)">(없음)</strong>
+        </div>
+        <div class="row">
+          <button id="btnAccept">수락(Accept)</button>
+          <button id="btnReject">거절(Reject)</button>
+        </div>
+        <div class="row">
+          <label for="switchInteractionId">활성 전환 Interaction ID</label>
+          <input type="text" id="switchInteractionId" placeholder="interactionId" />
+          <button id="btnSwitchActive">활성 전환</button>
+        </div>
+        <div class="row">
+          <button id="btnLoadDispositions">Disposition 목록</button>
+          <select id="dispositionSelect" style="min-width:260px"><option value="">Disposition 선택</option></select>
+          <button id="btnSetDisposition">Disposition 설정</button>
+        </div>
+        <div class="row">
+          <label for="noteText">노트</label>
+          <input type="text" id="noteText" placeholder="메모 내용" />
+          <button id="btnAddNote">노트 추가</button>
+        </div>
+        <div class="row">
+          <label for="transferTarget">전달 대상 (블라인드 전달용 번호)</label>
+          <input type="text" id="transferTarget" placeholder="큐/사용자/번호 등 (블라인드 전달 시 사용)" />
+          <button id="btnBlindTransfer">블라인드 전달</button>
+          <button id="btnTransfer" title="consultCall(번호)로 상담 콜 수립 후 사용">전달 완료(컨설트 → 전환)</button>
+        </div>
+        <div class="row">
+          <label for="assocObjectJson">연관 객체(JSON)</label>
+          <textarea id="assocObjectJson" rows="3" placeholder='{"type":"case","id":"123"}'></textarea>
+          <button id="btnAddAssocObject">연관 객체 추가</button>
+        </div>
+        <div class="row">
+          <label for="activeScreenName">활성 스크린</label>
+          <input type="text" id="activeScreenName" placeholder="예: details, activity, dispositions" />
+          <button id="btnSetActiveScreen">스크린 전환</button>
+        </div>
+        <div class="row">
+          <label for="suggestText">채팅 제안</label>
+          <input type="text" id="suggestText" placeholder="제안할 메시지" />
+          <button id="btnSuggestChat">메시지 제안</button>
+        </div>
+      </section>
+
+      <!-- 추가: 위젯 제어 섹션 (초기에는 숨김, 초기화 후 노출) -->
+      <section id="widget" class="hidden">
+        <h2>위젯 제어</h2>
+        <div class="row">
+          <button id="btnToggleWidgetMinimize">위젯 최소화</button>
+        </div>
+        <div class="row">
+          <span id="widgetStateLabel">상태: normal</span>
+        </div>
+      </section>
+    </div>
+
+    <div id="colResizer" class="col-resizer" role="separator" aria-orientation="vertical" aria-label="컬럼 리사이저" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62" aria-controls="leftCol rightCol"></div>
+
+    <div class="col right-col" id="rightCol">
+
+      <!-- 우측: 이벤트 모니터 -->
+      <section class="collapsible" id="eventMonitorSection">
+        <h2>📡 이벤트 모니터 <span class="toggle-icon">▼</span></h2>
+        <div class="section-body">
+          <div class="row status-actions">
+            <button id="btnClearMonitor" title="이벤트 목록 초기화">모니터 지우기</button>
+            <label style="font-size:12px;color:var(--muted);margin-left:8px">
+              <input type="checkbox" id="monitorAutoScroll" checked /> 자동 스크롤
+            </label>
+          </div>
+          <div id="eventMonitorBody" class="event-monitor-body"></div>
+        </div>
+      </section>
+
+      <!-- 우측: 상태 로그 (토글 가능) -->
+      <section class="collapsible collapsed" id="statusSection">
+        <h2>상태 로그 (Raw) <span class="toggle-icon">▼</span></h2>
+        <div class="section-body">
+          <div class="row status-actions">
+            <button id="btnSaveStatus" title="상태 로그를 파일로 저장">로그 저장</button>
+            <button id="btnClearStatus" title="상태 로그를 모두 삭제">로그 지우기</button>
+          </div>
+          <pre id="status"></pre>
+        </div>
+      </section>
+
+      <!-- 우측: Communicator 위젯 (토글 가능) -->
+      <section class="collapsible" id="widgetSection">
+        <h2>Communicator 위젯 <span class="toggle-icon">▼</span></h2>
+        <div class="section-body" style="padding:0">
+          <div id="bp-widget-root" class="widget-root"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <footer>
+    <small>실서버 연동 전제: 올바른 도메인, 권한, 서비스 구성이 필요합니다. 비밀번호는 브라우저에서 직접 입력하세요.</small>
+  </footer>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

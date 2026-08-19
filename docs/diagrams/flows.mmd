@@ -1,0 +1,40 @@
+%% Sequence/Flow Diagrams (Mermaid)
+sequenceDiagram
+  autonumber
+  participant U as 사용자
+  participant UI as 샘플 UI(main.js)
+  participant AD as Adapter(bp-adapter.js)
+  participant API as AdApi(api.js)
+  participant BP as Bright Pattern 테넌트
+
+  U->>UI: 페이지 열기
+  UI->>AD: initAdApi({domain, standalone, mountRoot})
+  AD->>API: new AdApi(...)
+  API-->>UI: ON_READY (또는 폴링으로 준비 확인)
+  UI->>AD: waitForReady()
+  UI->>API: getLoginState()
+  API-->>UI: isLoggedIn? (기존 세션 채택)
+
+  U->>UI: 로그인 클릭(username/password/tenant)
+  UI->>API: login(...)
+  API-->>UI: ON_LOGIN
+  UI->>API: getAgentNotReadyReasons()
+  UI->>API: getAgentState()
+
+  U->>UI: 채팅 시작
+  UI->>API: setService(serviceId)
+  UI->>API: startChat("web")
+  API-->>UI: ON_NEW_INTERACTION (chat)
+  U->>UI: 메시지 전송
+  UI->>API: sendChatMessage(text)
+  API-->>UI: ON_INTERACTION_STATE_CHANGE (messages)
+
+  U->>UI: 통화 시작
+  UI->>API: startCall(number)
+  API-->>UI: ON_NEW_INTERACTION (call)
+  U->>UI: 음소거/보류/DTMF
+  UI->>API: setCallMute/ setCallHold/ sendDtmf
+
+  U->>UI: 위젯 최소화
+  UI->>API: setWidgetMinimized(true)
+  API-->>UI: ON_WIDGET_MINIMIZED_CHANGE

@@ -1,0 +1,13 @@
+%% Architecture Diagram (Mermaid)
+flowchart LR
+  Browser["사용자 브라우저<br/>(BP_AgentDesktop UI)"] -- "HTTP(S) GET" --> StaticServer["정적 서버<br/>(server.js)"]
+  Browser -. "로드" .-> APIJS["https://<tenant>/agent/communicator/adapters/api.js"]
+  subgraph Page
+    UI["index.html<br/>assets/styles.css<br/>src/main.js"]
+    Adapter["src/bp-adapter.js"]
+    Widget["Communicator 위젯 (iframe)"]
+  end
+  Browser -->|mountRoot| Widget
+  Adapter <-- "AdApi" --> APIJS
+  Widget <-- "postMessage" --> APIJS
+  APIJS <-- "내부 통신" --> Tenant["Bright Pattern 테넌트"]

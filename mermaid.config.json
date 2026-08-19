@@ -1,0 +1,19 @@
+{
+  "theme": "default",
+  "themeVariables": {
+    "primaryColor": "#1f6feb",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#1f6feb",
+    "lineColor": "#6e7681",
+    "secondaryColor": "#0ea5e9"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "basis"
+  },
+  "sequence": {
+    "actorFontWeight": "bold",
+    "messageFontWeight": "normal"
+  },
+  "fontFamily": "'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+}

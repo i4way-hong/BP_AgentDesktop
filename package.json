@@ -1,0 +1,25 @@
+{
+  "name": "BP_AgentDesktop",
+  "version": "1.0.0",
+  "description": "Bright Pattern Agent Desktop Client-Side JavaScript API(5.19) 연동 샘플.",
+  "main": "server.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "mmd:version": "mmdc -V",
+    "mmd:arch": "mmdc -i docs/diagrams/architecture.mmd -o docs/diagrams/architecture.png -C mermaid.config.json",
+    "mmd:flows": "mmdc -i docs/diagrams/flows.mmd -o docs/diagrams/flows.png -C mermaid.config.json",
+    "mmd:all:png": "node ./scripts/renderAllMmd.js",
+    "docx:build": "node ./scripts/buildDocx.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.9.0",
+    "docx": "^9.5.1"
+  }
+}

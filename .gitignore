@@ -1,0 +1,10 @@
+node_modules
+
+# Local credentials and deployment configuration
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.key
